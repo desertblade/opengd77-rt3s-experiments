@@ -34,6 +34,9 @@
 #include "user_interface/uiLocalisation.h"
 #include "user_interface/uiUtilities.h"
 #include "interfaces/clockManager.h"
+#if defined(PLATFORM_MDUV380)
+#include "interfaces/adc.h"
+#endif
 #include "functions/rxPowerSaving.h"
 
 #if defined(CPU_MK22FN512VLL12)
@@ -525,7 +528,12 @@ static void aprsTxEnded(void)
 
 	audioAmpDisable(AUDIO_AMP_CHANNEL_RF);
 	HAL_GPIO_WritePin(RX_AUDIO_MUX_GPIO_Port, RX_AUDIO_MUX_Pin, GPIO_PIN_SET);
+#if defined(PLATFORM_MDUV380)
+	// APRS TX borrows this register for tone level; restore FM RX's knob gain.
+	radioSetFMRxAudioGain(getVolumeControl());
+#else
 	radioWriteReg2byte(0x44, 0x06, 0xCC); // set back to FM default
+#endif
 
 	trxSelectVoiceChannel(AT1846_VOICE_CHANNEL_MIC);
 #endif // PLATFORM_MD9600

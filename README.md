@@ -645,6 +645,11 @@ The header of the VFO / channel screens shows the volume knob position as
 turning the knob is the upstream *Options → Display → Visual volume*
 option.
 
+On RT3S / MDUV380, analogue FM also uses the AT1846S's internal audio gain
+over the lower half of the knob range, making the quietest settings quieter.
+The existing C6000 gain control remains in place; DMR volume behavior is
+unchanged.
+
 ### GPS log to GPX
 
 With the GPS mode set to *On+Log* the firmware records NMEA into the last
