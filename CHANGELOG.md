@@ -5,6 +5,10 @@ This is an independent fork maintained by **Marcin SP7TQ**, based on the
 upstream [OpenGD77](https://www.opengd77.com/) R20260131 source. Features
 marked *(untested)* build and pass host tests but still need on-air checking.
 
+## Unreleased
+
+* **Quieter FM receive at low volume settings** *(not yet built or hardware-tested)*: adds AT1846S audio attenuation over the lower half of the RT3S / MDUV380 volume range, stacked with the existing C6000 gain. DMR volume is unchanged.
+
 ## R20260131-SP7TQ.7 — 2026-11-25
 
 * **Fix: the radio froze with voice prompts on** (issue #21). With *Options → Sound → Prompt* set to *Voice* / *Voice L2* / *Voice L3*, highlighting a fork menu entry (PACE, Position, Coverage, Radio check, APRS RX, Event log, SSTV, and *Reset* / *Quickkeys* at the end of *Options*) froze the radio until the battery was pulled. These names have no recording in the voice pack; the firmware read past the voice pack table of contents. They are now spelled letter by letter, and playback refuses prompt numbers outside the table. Radios with *Beep* or *Silent* were not affected.
