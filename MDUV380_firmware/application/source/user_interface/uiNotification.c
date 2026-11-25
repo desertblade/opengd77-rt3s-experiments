@@ -209,6 +209,7 @@ void uiNotificationRefresh(void)
 				const int16_t totalBarLength = (((DISPLAY_SIZE_X - XBAR) - 4) - 4);
 				double slope;
 				int16_t bargraph;
+				int squelchPercent = 0;
 
 #if defined(HAS_SOFT_VOLUME)
 				if (notificationData.type == NOTIFICATION_TYPE_VOLUME)
@@ -223,8 +224,17 @@ void uiNotificationRefresh(void)
 				else
 #endif
 				{
+					uint8_t sql = currentChannelData->sql;
+					if (sql == 0)
+					{
+						sql = nonVolatileSettings.squelchDefaults[currentRadioDevice->trxCurrentBand[TRX_RX_FREQ_BAND]];
+					}
+					sql = CLAMP(sql, CODEPLUG_MIN_VARIABLE_SQUELCH, CODEPLUG_MAX_VARIABLE_SQUELCH);
+
 					slope = 1.0 * (totalBarLength) / (CODEPLUG_MAX_VARIABLE_SQUELCH - CODEPLUG_MIN_VARIABLE_SQUELCH);
-					bargraph = slope * (currentChannelData->sql - CODEPLUG_MIN_VARIABLE_SQUELCH);
+					bargraph = slope * (sql - CODEPLUG_MIN_VARIABLE_SQUELCH);
+					squelchPercent = (sql - CODEPLUG_MIN_VARIABLE_SQUELCH) * 100 /
+							(CODEPLUG_MAX_VARIABLE_SQUELCH - CODEPLUG_MIN_VARIABLE_SQUELCH);
 
 					strncpy(buffer, currentLanguage->squelch, 9);
 				}
@@ -234,7 +244,8 @@ void uiNotificationRefresh(void)
 				if (emcomStyleEnabled())
 				{
 					char value[8];
-					int percent = (int)(((bargraph * 100) + (totalBarLength / 2)) / totalBarLength);
+					int percent = (notificationData.type == NOTIFICATION_TYPE_SQUELCH) ?
+							squelchPercent : (int)(((bargraph * 100) + (totalBarLength / 2)) / totalBarLength);
 
 					snprintf(value, sizeof(value), "%d%%", percent);
 					emcomDrawLevelAlert(buffer, value, percent);
