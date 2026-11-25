@@ -30,6 +30,7 @@
 
 #include "hardware/AT1846S.h"
 #include "hardware/radioHardwareInterface.h"
+#include "interfaces/adc.h"
 
 
 #define DCS_PACKED_DATA_NUM          83
@@ -247,6 +248,10 @@ void AT1846sSetMode(int mode)
 	if (mode == RADIO_MODE_ANALOG)
 	{
 		I2C_AT1846S_send_Settings(AT1846FMSettings, sizeof(AT1846FMSettings) / AT1846_BYTES_PER_COMMAND);
+#if defined(PLATFORM_MDUV380)
+		// FM settings reload the stock gain; restore the knob's quiet-range value.
+		radioSetFMRxAudioGain(getVolumeControl());
+#endif
 	}
 	else
 	{
@@ -323,6 +328,35 @@ bool radioWriteReg2byte(uint8_t reg, uint8_t val1, uint8_t val2)
 	}
 
 	return ret;
+}
+
+// Add extra attenuation to the AT1846S FM audio path over the lower half of
+// the volume knob. The normal C6000 line-out gain bottoms out at -31; reducing
+// this chip's output as well makes the quiet end useful for close listening.
+// The stock 0xCC register value is restored at volume 0 and above. The exact
+// gain represented by the register nibbles is undocumented.
+void radioSetFMRxAudioGain(int8_t volume)
+{
+	uint8_t nibble;
+
+	if (volume == -99) // muted sentinel from getVolumeControl()
+	{
+		return;
+	}
+
+	if (volume >= 0)
+	{
+		nibble = 0x0C; // stock low byte: 0xCC
+	}
+	else
+	{
+		int gain = ((volume < -31) ? -31 : (int) volume);
+
+		// Map -31..0 onto nibble values 2..12, reaching stock level at zero.
+		nibble = (uint8_t)(2 + (((gain + 31) * 10) / 31));
+	}
+
+	(void)radioWriteReg2byte(0x44, 0x06, (uint8_t)((nibble << 4) | nibble));
 }
 
 bool radioReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2)

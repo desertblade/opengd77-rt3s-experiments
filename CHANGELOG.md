@@ -5,6 +5,10 @@ This is an independent fork maintained by **Marcin SP7TQ**, based on the
 upstream [OpenGD77](https://www.opengd77.com/) R20260131 source. Features
 marked *(untested)* build and pass host tests but still need on-air checking.
 
+## Unreleased
+
+* **Quieter FM receive at low volume settings** *(not yet built or hardware-tested)*: adds AT1846S audio attenuation over the lower half of the RT3S / MDUV380 volume range, stacked with the existing C6000 gain. DMR volume is unchanged.
+
 ## R20260131-SP7TQ.5 — 2026-11-22
 
 * **VFO power in the channel details**: the Power row showed `N/A` in the VFO; it now shows the master power (e.g. `Master 1W`) and `LEFT` / `RIGHT` change it at once, like `SK2` + `UP` / `DOWN` on the VFO screen.
