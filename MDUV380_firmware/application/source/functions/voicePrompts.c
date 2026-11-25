@@ -374,10 +374,6 @@ void voicePromptsPlay(void)
 	{
 		rxPowerSavingSetState(ECOPHASE_POWERSAVE_INACTIVE);
 
-		if (nonVolatileSettings.dmrRxAGC != 0)
-		{
-			soundResetDMRRxAGCGain();
-		}
 
 		taskENTER_CRITICAL();
 

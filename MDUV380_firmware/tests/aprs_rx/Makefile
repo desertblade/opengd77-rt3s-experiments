@@ -4,7 +4,7 @@ APP    := ../../application
 CFLAGS := -O2 -Wall -Wno-misleading-indentation -I$(APP)/include
 
 .PHONY: all clean
-all: test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked
+all: test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked test_dmr_rx_agc
 	./test_decoder
 	./test_parse
 	./test_tones
@@ -14,6 +14,7 @@ all: test_decoder test_parse test_tones test_sstv test_text test_sstv_store test
 	./test_net
 	./test_batt
 	./test_sked
+	./test_dmr_rx_agc
 
 test_decoder: test_decoder.c $(APP)/source/functions/aprsRxDecoder.c
 	$(CC) $(CFLAGS) -o $@ $^ -lm
@@ -42,5 +43,8 @@ test_batt: test_batt.c $(APP)/source/functions/batteryRuntime.c
 test_sked: test_sked.c $(APP)/source/functions/skedMath.c
 	$(CC) $(CFLAGS) -o $@ $^
 
+test_dmr_rx_agc: test_dmr_rx_agc.c $(APP)/source/functions/dmrRxAgc.c
+	$(CC) $(CFLAGS) -std=c11 -o $@ $^ -lm
+
 clean:
-	rm -f test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked
+	rm -f test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked test_dmr_rx_agc
