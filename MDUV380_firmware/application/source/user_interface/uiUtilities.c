@@ -1932,7 +1932,7 @@ void uiUtilityRenderHeader(bool isVFODualWatchScanning, bool isVFOSweepScanning,
 #if defined(HAS_EMCOM_UI)
 	if (emcomScreenActive() && (isVFODualWatchScanning == false) && (isVFOSweepScanning == false))
 	{
-		emcomRenderStatusBar();
+		emcomRenderStatusBar(forceBatteryDisplay);
 		if (isTransmittingIgnoringAPRSBeaconing() == false)
 		{
 			emcomDrawRssi(trxGetRSSIdBm(RADIO_DEVICE_PRIMARY));

@@ -4,7 +4,7 @@ APP    := ../../application
 CFLAGS := -O2 -Wall -Wno-misleading-indentation -I$(APP)/include
 
 .PHONY: all clean
-all: test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked test_dmr_rx_agc
+all: test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked test_dmr_rx_agc test_emcom_distance
 	./test_decoder
 	./test_parse
 	./test_tones
@@ -15,6 +15,7 @@ all: test_decoder test_parse test_tones test_sstv test_text test_sstv_store test
 	./test_batt
 	./test_sked
 	./test_dmr_rx_agc
+	./test_emcom_distance
 
 test_decoder: test_decoder.c $(APP)/source/functions/aprsRxDecoder.c
 	$(CC) $(CFLAGS) -o $@ $^ -lm
@@ -46,5 +47,8 @@ test_sked: test_sked.c $(APP)/source/functions/skedMath.c
 test_dmr_rx_agc: test_dmr_rx_agc.c $(APP)/source/functions/dmrRxAgc.c
 	$(CC) $(CFLAGS) -std=c11 -o $@ $^ -lm
 
+test_emcom_distance: test_emcom_distance.c $(APP)/source/user_interface/emcomDistance.c
+	$(CC) $(CFLAGS) -std=c11 -o $@ $^ -lm
+
 clean:
-	rm -f test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked test_dmr_rx_agc
+	rm -f test_decoder test_parse test_tones test_sstv test_text test_sstv_store test_net test_batt test_sked test_dmr_rx_agc test_emcom_distance
