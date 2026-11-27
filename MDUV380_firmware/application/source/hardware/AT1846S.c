@@ -65,6 +65,7 @@ typedef struct
 
 static RegCache_t registerCache[RADIO_DEVICE_MAX][127];// all values will be initialised to false,0,0 because its a global
 static uint8_t currentRegisterBank[RADIO_DEVICE_MAX] = { 0 }; // offset in cached page array
+static bool fmRxAudioCaptureActive = false;
 
 //
 // NOTE: register 0xFF is used for osDelay, values are concatenated for the delay value (in ms).
@@ -245,6 +246,13 @@ void AT1846sPostInit(void)
 
 void AT1846sSetMode(int mode)
 {
+	if (mode != RADIO_MODE_ANALOG)
+	{
+		// I2S capture is only valid in analogue FM; avoid carrying the capture
+		// override into the next analogue mode after a DMR mode change.
+		fmRxAudioCaptureActive = false;
+	}
+
 	if (mode == RADIO_MODE_ANALOG)
 	{
 		I2C_AT1846S_send_Settings(AT1846FMSettings, sizeof(AT1846FMSettings) / AT1846_BYTES_PER_COMMAND);
@@ -344,6 +352,14 @@ void radioSetFMRxAudioGain(int8_t volume)
 		return;
 	}
 
+	// The AT1846S feeds the HR-C6000 before its I2S decoder input. Keep the
+	// source at stock gain while APRS, tone or SSTV capture is active; otherwise
+	// a volume change could make the decoder input too quiet.
+	if (fmRxAudioCaptureActive)
+	{
+		volume = 0;
+	}
+
 	if (volume >= 0)
 	{
 		nibble = 0x0C; // stock low byte: 0xCC
@@ -357,6 +373,17 @@ void radioSetFMRxAudioGain(int8_t volume)
 	}
 
 	(void)radioWriteReg2byte(0x44, 0x06, (uint8_t)((nibble << 4) | nibble));
+}
+
+void radioSetFMRxAudioCaptureActive(bool active)
+{
+	if (fmRxAudioCaptureActive == active)
+	{
+		return;
+	}
+
+	fmRxAudioCaptureActive = active;
+	radioSetFMRxAudioGain(active ? 0 : getVolumeControl());
 }
 
 bool radioReadReg2byte(uint8_t reg, uint8_t *val1, uint8_t *val2)

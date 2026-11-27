@@ -36,6 +36,7 @@
 #include "interfaces/clockManager.h"
 #if defined(PLATFORM_MDUV380)
 #include "interfaces/adc.h"
+#include "interfaces/i2s.h"
 #endif
 #include "functions/rxPowerSaving.h"
 
@@ -847,6 +848,13 @@ static bool aprsSendPacket(CodeplugAPRSConfig_t *config, aprsBeaconingLocation_t
 	trxSelectVoiceChannel(AT1846_VOICE_CHANNEL_TONE1);
 
 	int volume = getVolumeControl() + 30;
+
+#if defined(PLATFORM_MDUV380)
+	// APRS TX reuses AT1846S register 0x44 for tone level. Stop the
+	// upstream I2S capture and release its stock-gain override first.
+	i2sAprsRxStop();
+	radioSetFMRxAudioCaptureActive(false);
+#endif
 
 	if (volume >= 0)
 	{
