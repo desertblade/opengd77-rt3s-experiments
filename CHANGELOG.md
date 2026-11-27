@@ -7,7 +7,7 @@ marked *(untested)* build and pass host tests but still need on-air checking.
 
 ## Unreleased
 
-* **Quieter FM receive at low volume settings** *(not yet built or hardware-tested)*: adds AT1846S audio attenuation over the lower half of the RT3S / MDUV380 volume range, stacked with the existing C6000 gain. DMR volume is unchanged; the AT1846S remains at its stock gain while APRS RX, the tone decoders or SSTV capture audio for the HR-C6000 I2S input.
+* **Quieter FM receive at low volume settings** adds AT1846S audio attenuation over the lower half of the RT3S / MDUV380 volume range, stacked with the existing C6000 gain. DMR volume is unchanged; the AT1846S remains at its stock gain while APRS RX, the tone decoders or SSTV capture audio for the HR-C6000 I2S input.
 
 ## R20260131-SP7TQ.7 — 2026-11-25
 
