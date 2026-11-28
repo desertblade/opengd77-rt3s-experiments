@@ -5,6 +5,16 @@ This is an independent fork maintained by **Marcin SP7TQ**, based on the
 upstream [OpenGD77](https://www.opengd77.com/) R20260131 source. Features
 marked *(untested)* build and pass host tests but still need on-air checking.
 
+## R20260131-SP7TQ.8 — 2026-11-27
+
+* **Event log recording can be paused** (issue #32): `#` on the Event log screen switches recording off and on (kept in the settings, the title shows `OFF`). The switch is logged as `log off` / `log on`.
+* **Fix: APRS messages from internet services** (issue #34): replies and acks from WXBOT, WTSAPP and other APRS-IS services come to RF through an IGate as third-party frames. They are now unwrapped, so the reply lands in the messages and the ack marks the sent message.
+* **Fix: APRS frame detail jumped to another frame** (issue #35) when new frames pushed it out of the 8-frame history. The detail view keeps its own copy now (`old` in the header).
+* **Fix: APRS RX kept listening after leaving its screen with a long RED** (issue #36), also the Decoders screen. Frames no longer arrive with background RX off.
+* **DMR SMS: `1` starts a new message**, the same key as on the APRS RX screen (issue #40). `#` still works.
+* **EMCOM status bar always shows the battery.** With *Options → Display → Time* on, the clock used to replace the battery readout, although the footer already shows the time; that option now only applies to the classic screen. Unlit volume bars are drawn dim at full height instead of as dots, so a low volume no longer looks like missing data.
+* **Squelch notification in exact 5 % steps** (issue #28, PR #30 by desertblade).
+
 ## R20260131-SP7TQ.7 — 2026-11-25
 
 * **Fix: the radio froze with voice prompts on** (issue #21). With *Options → Sound → Prompt* set to *Voice* / *Voice L2* / *Voice L3*, highlighting a fork menu entry (PACE, Position, Coverage, Radio check, APRS RX, Event log, SSTV, and *Reset* / *Quickkeys* at the end of *Options*) froze the radio until the battery was pulled. These names have no recording in the voice pack; the firmware read past the voice pack table of contents. They are now spelled letter by letter, and playback refuses prompt numbers outside the table. Radios with *Beep* or *Silent* were not affected.

@@ -18,6 +18,7 @@
 #include "functions/sound.h"
 #include "functions/aprs.h"
 #include "functions/ticks.h"
+#include "functions/settings.h"
 
 #define REC_SIZE          32U
 #define RECS              (EVENT_LOG_FLASH_SIZE / REC_SIZE)   // 2048
@@ -136,6 +137,11 @@ void eventLogAdd(eventLogType_t type, const char *fmt, ...)
 	eventLogRecord_t rec;
 	va_list args;
 
+	if (settingsIsOptionBitSet(BIT_EVENT_LOG_OFF))
+	{
+		return;
+	}
+
 	if (initialised == false)
 	{
 		init();
@@ -151,6 +157,30 @@ void eventLogAdd(eventLogType_t type, const char *fmt, ...)
 	va_end(args);
 
 	writeRecord(&rec);
+}
+
+bool eventLogIsEnabled(void)
+{
+	return (settingsIsOptionBitSet(BIT_EVENT_LOG_OFF) == false);
+}
+
+void eventLogSetEnabled(bool on)
+{
+	if (on == eventLogIsEnabled())
+	{
+		return;
+	}
+
+	if (on)
+	{
+		settingsSetOptionBit(BIT_EVENT_LOG_OFF, false);
+		eventLogAdd(EVENT_LOG_SYS, "log on");
+	}
+	else
+	{
+		eventLogAdd(EVENT_LOG_SYS, "log off");
+		settingsSetOptionBit(BIT_EVENT_LOG_OFF, true);
+	}
 }
 
 uint32_t eventLogCount(void)

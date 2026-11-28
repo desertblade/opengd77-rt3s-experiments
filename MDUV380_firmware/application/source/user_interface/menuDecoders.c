@@ -302,11 +302,19 @@ static void decUpdate(uint32_t now)
 	}
 }
 
+// Also called when the screen is left by a long RED or a jump to the main screen
+static void decExitCallback(void *data)
+{
+	UNUSED_PARAMETER(data);
+	aprsRxSetMonitor(false);
+}
+
 menuStatus_t menuDecoders(uiEvent_t *ev, bool isFirstRun)
 {
 	if (isFirstRun)
 	{
 		menuDataGlobal.numItems = 0;
+		menuSystemRegisterExitCallback(decExitCallback, NULL);
 		aprsRxSetMonitor(true);
 		decLastDraw = 0;
 		decDraw();

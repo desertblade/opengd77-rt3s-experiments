@@ -58,6 +58,10 @@ uint32_t eventLogCount(void);
 uint32_t eventLogSerial(void);              // changes with every new record
 bool eventLogGet(uint32_t indexFromNewest, eventLogRecord_t *rec);
 void eventLogClear(void);
+// Recording on / off (issue #32: less wear of the SPI flash). Off: eventLogAdd() writes nothing.
+// The switch itself is logged ("log off" before, "log on" after), so the gap is visible.
+bool eventLogIsEnabled(void);
+void eventLogSetEnabled(bool on);
 const char *eventLogTypeName(uint8_t type); // 3 letters
 void eventLogTick(void);                    // main loop: TX / FM RX / DMR call detection
 
