@@ -702,9 +702,8 @@ void emcomRenderStatusBar(bool forceBatteryDisplay)
 	bool isTx = (st == ST_TX);
 	bool digital = (trxGetMode() == RADIO_MODE_DIGITAL);
 	bool batteryIsLow = batteryIsLowWarning();
+	bool displayTime = (settingsIsOptionBitSet(BIT_DISPLAY_TIME_IN_HEADER) && (forceBatteryDisplay == false) && (batteryIsLow == false));
 	uint32_t barCol, fg;
-
-	UNUSED_PARAMETER(forceBatteryDisplay); // the battery is always shown here
 	int16_t x;
 
 	selectPalette();
@@ -792,13 +791,22 @@ void emcomRenderStatusBar(bool forceBatteryDisplay)
 		textRaw(x, 2, "a", (beaconing ? FONT_SIZE_1_BOLD : FONT_SIZE_1), (isTx ? fg : (beaconing ? (colourStateRxHeader ? fg : pal->rx) : pal->mut)), false);
 	}
 
-	// Right side: battery, volume, GPS. The battery is always shown: the clock is in the footer,
-	// so Options > Display > Time (time instead of the battery) only applies to the classic screen.
-	// The Display menu still selects percent or voltage.
+	// Right side: time or battery, volume, GPS. The Display menu controls whether
+	// time replaces the battery readout and whether that readout is percent or voltage.
 	int16_t r = (DISPLAY_SIZE_X - 2);
 	bool low = batteryIsLow;
 	uint32_t battCol = (low ? pal->tx : fg);
 
+	if (displayTime)
+	{
+		struct tm t;
+		time_t_custom secs = uiDataGlobal.dateTimeSecs;
+
+		gmtime_r_Custom(&secs, &t);
+		snprintf(buf, sizeof(buf), "%02d%c%02d", t.tm_hour, (((t.tm_sec % 2) == 0) ? ':' : ' '), t.tm_min);
+		r -= text(r, 2, buf, FONT_SIZE_1, fg, true) + 4;
+	}
+	else
 	{
 		int pct = getBatteryPercentage();
 
@@ -844,15 +852,12 @@ void emcomRenderStatusBar(bool forceBatteryDisplay)
 		}
 		else
 		{
-			// unlit bars keep their height in a dim colour: a row of dots read as "no data"
-			uint32_t unlit = (pal->cues ? pal->line : pal->mut);
-
 			for (int b = 0; b < 4; b++)
 			{
 				int16_t h = (int16_t)(2 * (b + 1));
 				int16_t bx = (int16_t)((r - 8) + (b * 2));
 
-				fill(bx, (9 - h), 1, h, ((b < vol) ? fg : unlit));
+				fill(bx, (b < vol) ? (9 - h) : 8, 1, ((b < vol) ? h : 1), fg);
 			}
 		}
 		r -= 12;

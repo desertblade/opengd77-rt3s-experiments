@@ -175,9 +175,6 @@ bool aprsRxParse(const aprsRxFrame_t *frame, aprsRxParsed_t *parsed);
 uint32_t aprsRxFormatTnc2(const aprsRxFrame_t *frame, char *out, uint32_t outSize);
 bool aprsRxParsePosition(const aprsRxParsed_t *parsed, aprsRxPosition_t *pos);
 bool aprsRxParseMessage(const aprsRxParsed_t *parsed, aprsRxMessage_t *msg);
-// Third-party frame ("}SRC>DST,PATH:info", sent by IGates): src / dst / info become the inner ones.
-// false: a third-party frame with a broken header. Other frames are left as they are (true).
-bool aprsRxUnwrapThirdParty(aprsRxParsed_t *parsed);
 double aprsRxDistanceKm(double lat1, double lon1, double lat2, double lon2);
 double aprsRxBearingDeg(double lat1, double lon1, double lat2, double lon2);
 void aprsRxFormatDistance(double km, char *buf, uint32_t size); // "850m", "12.3km", "123km"

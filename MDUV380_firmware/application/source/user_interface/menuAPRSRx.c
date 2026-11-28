@@ -83,8 +83,6 @@ static bool aprsMonRawView = false;
 static uint32_t aprsMonSelected = 0;   // 0 = newest
 static uint32_t aprsMonRawScroll = 0;
 static uint32_t aprsMonLastDraw = 0;
-static aprsRxFrame_t aprsMonRawFrame; // copy of the frame shown in raw view: new frames do not change it (issue #35)
-static bool aprsMonRawGone = false; // that frame has left the history
 static APRS_RX_CCMRAM char aprsMonText[300]; // TNC2 text of the frame shown in raw view (CCM, always written before use)
 static void aprsMonSetEnabled(bool enable);
 static void aprsMonUpdate(uint32_t now);
@@ -125,7 +123,6 @@ static void aprsMonUpdate(uint32_t now)
 		}
 		if (aprsMonSelected >= aprsRxHistoryCount())
 		{
-			aprsMonRawGone = aprsMonRawView;
 			aprsMonSelected = ((aprsRxHistoryCount() > 0) ? (aprsRxHistoryCount() - 1) : 0);
 		}
 		aprsMonLastGen = gen;
@@ -328,7 +325,14 @@ static void aprsMonDrawFrames(void)
 static void aprsMonDrawRaw(void)
 {
 	char line[APRS_MON_CHARS + 1];
-	const aprsRxFrame_t *f = &aprsMonRawFrame;
+	const aprsRxFrame_t *f = aprsRxHistoryGet(aprsMonSelected);
+
+	if (f == NULL)
+	{
+		aprsMonRawView = false;
+		aprsMonDrawFrames();
+		return;
+	}
 
 	uint32_t textLen = aprsRxFormatTnc2(f, aprsMonText, sizeof(aprsMonText));
 	uint32_t textLines = ((textLen + APRS_MON_CHARS - 1) / APRS_MON_CHARS);
@@ -1331,14 +1335,7 @@ static void aprsMonDraw(void)
 	uint32_t unread = aprsRxMessageUnreadCount();
 	if (aprsMonRawView)
 	{
-		if (aprsMonRawGone)
-		{
-			snprintf(line, sizeof(line), "old");
-		}
-		else
-		{
-			snprintf(line, sizeof(line), "%u/%u", (unsigned)(aprsMonSelected + 1), (unsigned)aprsRxHistoryCount());
-		}
+		snprintf(line, sizeof(line), "%u/%u", (unsigned)(aprsMonSelected + 1), (unsigned)aprsRxHistoryCount());
 		displayPrintCore((DISPLAY_SIZE_X - 2 - (int16_t)(strlen(line) * 6)), sy, line, FONT_SIZE_1, TEXT_ALIGN_LEFT, false);
 	}
 	else if (unread)
@@ -1606,10 +1603,8 @@ static bool aprsMonHandleEvent(uiEvent_t *ev)
 		{
 			aprsMonRawView = false;
 		}
-		else if ((aprsMonView == APRS_MON_VIEW_FRAMES) && (aprsRxHistoryGet(aprsMonSelected) != NULL))
+		else if ((aprsMonView == APRS_MON_VIEW_FRAMES) && (aprsRxHistoryCount() > 0))
 		{
-			memcpy(&aprsMonRawFrame, aprsRxHistoryGet(aprsMonSelected), sizeof(aprsRxFrame_t));
-			aprsMonRawGone = false;
 			aprsMonRawView = true;
 			aprsMonRawScroll = 0;
 		}
@@ -1708,19 +1703,11 @@ static bool aprsMonHandleEvent(uiEvent_t *ev)
 	return true;
 }
 
-// Also called when the screen is left by a long RED or a jump to the main screen (issue #36)
-static void aprsMonExitCallback(void *data)
-{
-	UNUSED_PARAMETER(data);
-	aprsMonSetEnabled(false);
-}
-
 menuStatus_t menuAPRSRx(uiEvent_t *ev, bool isFirstRun)
 {
 	if (isFirstRun)
 	{
 		menuDataGlobal.numItems = 0;
-		menuSystemRegisterExitCallback(aprsMonExitCallback, NULL);
 		aprsMonSetEnabled(true);
 		aprsMonDraw();
 		return MENU_STATUS_SUCCESS;

@@ -128,33 +128,6 @@ int main(void)
 		if (!good) fails++;
 	}
 
-	// Third-party traffic from an IGate (replies of internet services, issue #34)
-	struct { const char *info; int ok; const char *src, *to, *text, *id; int ack; } tp[] = {
-		{ "}WXBOT>APRS,TCPIP,SP7ABC*::SP7TQ-7  :Lodz: 3C cloudy{AB", 1, "WXBOT", "SP7TQ-7", "Lodz: 3C cloudy", "AB", 0 },
-		{ "}WXBOT>APRS,TCPIP,SP7ABC*::SP7TQ-7  :ack12", 1, "WXBOT", "SP7TQ-7", "", "12", 1 },
-		{ "}WTSAPP>APWW11,TCPIP*,qAC,T2POL::SP7TQ    :hi{3}", 1, "WTSAPP", "SP7TQ", "hi", "3", 0 },
-		{ "}SP5ABC-9>APRS:}WXBOT>APRS,TCPIP*::SP7TQ    :nested{9", 1, "WXBOT", "SP7TQ", "nested", "9", 0 },
-		{ "}NOHEADER", 0, "", "", "", "", 0 },
-		{ "}TOOLONGCALL>APRS::SP7TQ    :x", 0, "", "", "", "", 0 },
-	};
-	for (unsigned i = 0; i < sizeof(tp) / sizeof(tp[0]); i++)
-	{
-		aprsRxParsed_t p; aprsRxMessage_t msg;
-		mkFrame(&f, "SP7ABC", 10, "APRS", tp[i].info, (int)strlen(tp[i].info));
-		int ok = aprsRxParse(&f, &p) && aprsRxUnwrapThirdParty(&p) && aprsRxParseMessage(&p, &msg);
-		int good = (ok == tp[i].ok) && (!ok || (strcmp(p.src, tp[i].src) == 0 && strcmp(msg.addressee, tp[i].to) == 0 &&
-				strcmp(msg.text, tp[i].text) == 0 && strcmp(msg.msgId, tp[i].id) == 0 && msg.isAck == tp[i].ack));
-		printf("%-4s 3rd %-30.30s src=%s to=%s text='%s' id=%s ack=%d\n", good ? "OK" : "FAIL", tp[i].info, ok ? p.src : "-", ok ? msg.addressee : "-", ok ? msg.text : "", ok ? msg.msgId : "", ok ? msg.isAck : 0);
-		if (!good) fails++;
-	}
-	{
-		// a normal frame is left as it is
-		aprsRxParsed_t p;
-		mkFrame(&f, "SP5ABC", 0, "APRS", ":SP7TQ    :plain{1", 18);
-		int good = aprsRxParse(&f, &p) && aprsRxUnwrapThirdParty(&p) && (strcmp(p.src, "SP5ABC") == 0) && (p.info[0] == ':');
-		printf("%-4s 3rd: plain frame untouched\n", good ? "OK" : "FAIL"); if (!good) fails++;
-	}
-
 	// Geo
 	double d = aprsRxDistanceKm(51.7592, 19.4560, 52.2297, 21.0122); // Lodz -> Warsaw ~ 119 km
 	double b = aprsRxBearingDeg(51.7592, 19.4560, 52.2297, 21.0122);  // ~ 63 deg

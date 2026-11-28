@@ -234,10 +234,11 @@ aligned:
 | EMCOM rows (TX) | time-out timer bar with the remaining time (the last 10 s hatched, the countdown in an inverse chip), TX tone / bandwidth or TG / CC / TS and contact, the keys usable while transmitting |
 | Footer | UTC time and date, `RX` / `TX` / `SCAN`, key / PTT lock, SOS, `TX OFF` when TX inhibit is on |
 
-The EMCOM status bar always shows the battery (the clock is in the footer), so
-*Options → Display →* **Time in header** only applies to the classic screen.
-**Battery** selects percentage or voltage. **Visual volume** controls the
-volume notification. When **UTC** is
+The existing *Options → Display* header settings also apply to the EMCOM status
+bar: **Time in header** replaces the battery readout (unless a low-battery
+warning or forced battery display is active), and **Battery** selects percentage
+or voltage. **Visual volume** controls the EMCOM header volume indicator and the
+volume notification. The footer clock remains available in either case. When **UTC** is
 set to **No**, the footer shows local time first and Zulu time second using
 the trailing `Z` marker on the Zulu time; with **UTC = Yes**, it shows Zulu
 time only.
@@ -340,13 +341,8 @@ starts 64 KB later) and survives a power cycle.
 
 On the radio: newest first, type field in colour, the selected entry in
 full with its date in the footer; `0` then `GREEN` clears it (any other key
-cancels). `#` pauses / resumes recording (the title shows `OFF`; the
-switch itself is logged as `log off` / `log on`, so the gap is visible). On a computer:
+cancels). On a computer:
 `MDUV380_firmware/tools/opengd77_event_log.py --csv log.csv`.
-
-Flash wear: an entry is one page program; a 4 KB sector is erased once per
-2048 entries (once per pass of the ring). At the W25Q128's 100 000 erase
-cycles that is about 200 million entries.
 
 ### Field tools — *main menu → PACE / Position / Coverage / Radio check / Net control*
 
@@ -645,8 +641,7 @@ APRS beacons and message replies.
 ### Volume indicator
 
 The header of the VFO / channel screens shows the volume knob position as
-4 bars left of the GPS label (`x` when muted; on the EMCOM screen the unlit
-bars are drawn dim at full height). The pop-up bar shown while
+4 bars left of the GPS label (`x` when muted). The pop-up bar shown while
 turning the knob is the upstream *Options → Display → Visual volume*
 option.
 

@@ -332,7 +332,7 @@ static void drawList(void)
 		selectedSeq = 0U;
 		drawEmpty(listY);
 #if defined(HAS_DMR_SMS_TX)
-		footer("1 NEW  RED EXIT", "1 new message", "RED back");
+		footer("# NEW  RED EXIT", "# new message", "RED back");
 #else
 		footer("RED EXIT", "", "RED back");
 #endif
@@ -397,7 +397,7 @@ static void drawList(void)
 		else
 		{
 #if defined(HAS_DMR_SMS_TX)
-			emcomUiKeyBar("GRN READ  1 NEW  0 DEL");
+			emcomUiKeyBar("GRN READ  # NEW  0 DEL");
 #else
 			emcomUiKeyBar("GRN READ  0 DEL  RED EXIT");
 #endif
@@ -1031,8 +1031,7 @@ menuStatus_t menuDmrSms(uiEvent_t *ev, bool isFirstRun)
 				saveQuickkeyMenuIndex(ev->keys.key, menuSystemGetCurrentMenuNumber(), 0, 0);
 			}
 #if defined(HAS_DMR_SMS_TX)
-			// New message: 1, as on the APRS RX screen (issue #40); # still works
-			else if ((KEYCHECK_SHORTUP(ev->keys, KEY_1) || KEYCHECK_SHORTUP(ev->keys, KEY_HASH)) && (view == VIEW_LIST))
+			else if (KEYCHECK_SHORTUP(ev->keys, KEY_HASH) && (view == VIEW_LIST))
 			{
 				composeText[0] = 0;
 				composeStart(0U, false, VIEW_LIST);

@@ -108,16 +108,16 @@ static void updateScreenEmcom(void)
 	displayClearBuf();
 	if (count == 0U)
 	{
-		emcomUiTitle(currentLanguage->event_log, (eventLogIsEnabled() ? "0" : "OFF"));
+		emcomUiTitle(currentLanguage->event_log, "0");
 		emcomUiStrip();
-		emcomUiChip(2, (EMCOM_UI_STRIP_Y + 2), (eventLogIsEnabled() ? "EMPTY" : "REC OFF"), THEME_ITEM_FG_DECORATION, EMCOM_CHIP_OUTLINE, false);
+		emcomUiChip(2, (EMCOM_UI_STRIP_Y + 2), "EMPTY", THEME_ITEM_FG_DECORATION, EMCOM_CHIP_OUTLINE, false);
 		displayThemeApply(THEME_ITEM_FG_DEFAULT, THEME_ITEM_BG);
 		displayPrintCentered((EMCOM_UI_BODY_Y + 16), "Log empty", FONT_SIZE_3);
 		displayThemeApply(THEME_ITEM_FG_DECORATION, THEME_ITEM_BG);
 		displayPrintCentered((EMCOM_UI_BODY_Y + 40), "TX, RX, DMR, APRS, MSG,", FONT_SIZE_1);
 		displayPrintCentered((EMCOM_UI_BODY_Y + 50), "DTMF, SOS, SSTV events", FONT_SIZE_1);
 		displayThemeResetToDefault();
-		emcomUiKeyBar("# REC ON/OFF  RED EXIT");
+		emcomUiKeyBar("RED EXIT");
 		displayRender();
 		return;
 	}
@@ -127,7 +127,7 @@ static void updateScreenEmcom(void)
 		selected = (count - 1U);
 	}
 
-	snprintf(buf, sizeof(buf), "%s%u/%u", (eventLogIsEnabled() ? "" : "OFF "), (unsigned)(selected + 1U), (unsigned)count);
+	snprintf(buf, sizeof(buf), "%u/%u", (unsigned)(selected + 1U), (unsigned)count);
 	emcomUiTitle(currentLanguage->event_log, buf);
 
 	// the selected entry: full text big (contrast) or small, above the key bar
@@ -185,7 +185,7 @@ static void updateScreenEmcom(void)
 	}
 	else
 	{
-		emcomUiKeyBar("0 CLEAR  # REC  RED EXIT");
+		emcomUiKeyBar("UP/DN  0 CLEAR  RED EXIT");
 	}
 	displayRender();
 }
@@ -208,7 +208,7 @@ static void updateScreen(void)
 	displayClearBuf();
 	menuDisplayTitle(currentLanguage->event_log);
 
-	snprintf(buf, sizeof(buf), "%s%u", (eventLogIsEnabled() ? "" : "OFF "), (unsigned)count);
+	snprintf(buf, sizeof(buf), "%u", (unsigned)count);
 	displayThemeApply(THEME_ITEM_FG_DECORATION, THEME_ITEM_BG_MENU_NAME);
 	displayPrintCore((DISPLAY_SIZE_X - 3 - (int16_t)(strlen(buf) * 6)), 4, buf, FONT_SIZE_1, TEXT_ALIGN_LEFT, false);
 
@@ -341,14 +341,6 @@ menuStatus_t menuEventLog(uiEvent_t *ev, bool isFirstRun)
 			else if (KEYCHECK_SHORTUP(ev->keys, KEY_0))
 			{
 				confirmClear = true;
-				updateScreen();
-			}
-			else if (KEYCHECK_SHORTUP(ev->keys, KEY_HASH))
-			{
-				eventLogSetEnabled(eventLogIsEnabled() == false); // issue #32
-				uiNotificationShow(NOTIFICATION_TYPE_MESSAGE, NOTIFICATION_ID_MESSAGE, 1500U,
-						(eventLogIsEnabled() ? "Event log: on" : "Event log: off"), false);
-				soundSetMelody(MELODY_ACK_BEEP);
 				updateScreen();
 			}
 			else if (KEYCHECK_PRESS(ev->keys, KEY_DOWN))

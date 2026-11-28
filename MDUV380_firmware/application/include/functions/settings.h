@@ -160,8 +160,6 @@ typedef enum
 #if defined(PLATFORM_MD2017)
 	BIT_TRACKBALL_ENABLED           = (SETTINGS_BITS_BANK_0 | (1 << 22)),
 	BIT_TRACKBALL_FAST_MOTION       = (SETTINGS_BITS_BANK_0 | (1 << 23)),
-#else
-	BIT_EVENT_LOG_OFF               = (SETTINGS_BITS_BANK_0 | (1 << 22)), // Fork: event log recording paused (bit unused without a trackball)
 #endif
 #if defined(PLATFORM_MDUV380) && !defined(PLATFORM_VARIANT_UV380_PLUS_10W)
 	BIT_FORCE_10W_RADIO             = (SETTINGS_BITS_BANK_0 | (1 << 24)),

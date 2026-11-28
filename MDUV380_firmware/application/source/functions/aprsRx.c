@@ -752,8 +752,7 @@ static void handleMessage(const aprsRxFrame_t *frame, uint32_t now)
 	aprsRxMessage_t msg;
 	char own[APRS_RX_CALL_LEN + 4];
 
-	// Replies from internet services (WXBOT, WTSAPP ...) come through an IGate as third-party frames
-	if ((aprsRxParse(frame, &p) == false) || (aprsRxUnwrapThirdParty(&p) == false) || (aprsRxParseMessage(&p, &msg) == false))
+	if ((aprsRxParse(frame, &p) == false) || (aprsRxParseMessage(&p, &msg) == false))
 	{
 		return;
 	}
